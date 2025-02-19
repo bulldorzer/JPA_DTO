@@ -4,6 +4,7 @@ import com.korea.shop.dto.ItemDTO;
 import com.korea.shop.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -14,6 +15,7 @@ public class ItemController {
 
     private final ItemService itemService;
 
+    @PreAuthorize("hasAnyRole('ROLE_USER')") // 예시
     @GetMapping
     public ResponseEntity<List<ItemDTO>> getAllItems() {
         return ResponseEntity.ok(itemService.getAllItems());

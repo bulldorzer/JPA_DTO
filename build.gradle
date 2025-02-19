@@ -35,8 +35,16 @@ dependencies {
 
 	implementation 'org.modelmapper:modelmapper:3.2.0'
 
+	// 시큐리티를 구현하기 위한 디펜던시
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
+	// 객체를 JSON 문자열로 처리하기 위한 GSON 라이브러리
+	implementation 'com.google.code.gson:gson:2.11.0'
+
+	// JWT API를 사용하기 위한 라이브러리 - JWT 생성을 위함
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 }
 
 tasks.named('test') {

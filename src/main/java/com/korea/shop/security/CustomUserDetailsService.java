@@ -12,6 +12,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
+
+/**
+ * CustomUSerDetailsService
+ * 사용자의 인증 처리를 하기 위함
+ */
 @Service
 @Log4j2
 @RequiredArgsConstructor
@@ -29,8 +34,8 @@ public class CustomUserDetailsService  implements UserDetailsService {
             throw new UsernameNotFoundException("Not Found");
         }
 
+        // MemberDTO 타입으로 반환
         MemberDTO memeberDTO = new MemberDTO(
-                member.getId(),
                 member.getName(),
                 member.getEmail(),
                 member.getPw(),

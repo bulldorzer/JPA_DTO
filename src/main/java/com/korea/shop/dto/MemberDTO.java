@@ -19,7 +19,7 @@ public class MemberDTO extends User {
     
     private List<String> roleNames = new ArrayList<>(); // 권한 리스트 엔티티와 다름
     
-    public MemberDTO(Long id, String email, String pw, String name, Address address, List<String> roleNames){
+    public MemberDTO(String email, String pw, String name, Address address, List<String> roleNames){
         // user클래스 생성할때 (로그인아이디, 비밀번호, 역할( ROLE_ 글자가 있어야 함 ))
         super(
                 email,
