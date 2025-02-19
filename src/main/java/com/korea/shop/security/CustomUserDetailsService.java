@@ -30,18 +30,23 @@ public class CustomUserDetailsService  implements UserDetailsService {
         Member member = memberRepository.getWithRoles(username);
 
         log.info("---------------<loadUserByUsername>---------------");
+        log.info(username);
         if (member == null){
-            throw new UsernameNotFoundException("Not Found");
+            log.error("User not Found: "+ username);
+            throw new UsernameNotFoundException("User with email "+username+"Not Found"); // 명확한 메세지 제공
         }
 
         // MemberDTO 타입으로 반환
         MemberDTO memeberDTO = new MemberDTO(
-                member.getName(),
                 member.getEmail(),
                 member.getPw(),
+                member.getName(),
                 member.getAddress(),
-                member.getMemberRoleList().stream().map(memberRole -> memberRole.name()).collect(Collectors.toList())
+                member.getMemberRoleList().stream().map(memberRole
+                        -> memberRole.name()).collect(Collectors.toList())
         );
-        return null;
+
+        log.info("memeberDTO: "+memeberDTO);
+        return memeberDTO;
     }
 }

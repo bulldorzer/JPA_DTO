@@ -33,8 +33,12 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         log.info("check URI ... "+path);
 
-        // api/member/ 경로의 호출은 체크하지 않음
-        if (path.startsWith("/api/members/") || path.startsWith("/api/items")){
+        // api/members/ 경로의 호출은 체크하지 않음
+        if (path.startsWith("/api/members/login")){
+            return true;
+        }
+
+        if (path.startsWith("/api/items/")){
             return true;
         }
 
@@ -47,6 +51,12 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         log.info("=====================< JWTCheckFilter >=============================");
 
         String authHeaderStr = request.getHeader("Authorization");
+
+        if (authHeaderStr == null || !authHeaderStr.startsWith("Bearer ")){
+            log.info("==================< NO JWT Found, skipping Filter >============================");
+            filterChain.doFilter(request,response);
+            return;
+        }
         
         try {
             // Bearer 타입 accesstoken 실제 토큰 부분 추출
@@ -62,7 +72,11 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             Address address = (Address) claims.get("address");
             List<String> roleNames = (List<String>) claims.get("roleNames");
 
-            MemberDTO memberDTO = new MemberDTO(email,name,pw,address,roleNames);
+            MemberDTO memberDTO = new MemberDTO(email ,pw ,name ,address ,roleNames);
+
+            log.info("============<MemberDTO>==============");
+            log.info(memberDTO);
+            log.info(memberDTO.getAuthorities());
 
             /*
             * Spring Security 인증 객체 설정 - 사용자를 수동으로 인증 시키는 역할

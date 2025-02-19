@@ -14,29 +14,29 @@ public class JWTUtil {
 
   // 시크릿 키 설정 (32bit 이상 필요)
   // JWT 서명을 위한 비밀키
-  private static String key = "1234567890123456789012345678901234567890";
+  private static final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
   // JWT 생성 메서드
   // valueMap : 사용자 정보, min: 토큰 유효시간
   public static String generateToken(Map<String, Object> valueMap, int min) {
 
-    SecretKey key = null;
     try {
       // HMAC-SHA 알고리즘을 이용하여 비밀키 생성 -> UTF-8형식으로 변환
-      key = Keys.hmacShaKeyFor(JWTUtil.key.getBytes("UTF-8"));
+//      key = Keys.hmacShaKeyFor(JWTUtil.key.getBytes("UTF-8"));
+      // 토큰 객체 생성
+      String jwtStr = Jwts.builder() // JWT API를 통해 가져온 Jwts 객체
+              .setHeader(Map.of("typ","JWT")) // 헤더 설정
+              .setClaims(valueMap) // 사용자 정보 추가
+              .setIssuedAt(Date.from(ZonedDateTime.now().toInstant())) // 발급시간
+              .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant())) // 만료시간
+              .signWith(key) // SecretKey 사용
+              .compact();
+      return jwtStr;
     }catch (Exception e){
       throw new RuntimeException(e.getMessage());
     }
 
-    // 토큰 객체 생성
-    String jwtStr = Jwts.builder() // JWT API를 통해 가져온 Jwts 객체
-            .setHeader(Map.of("typ","JWT")) // 헤더 설정
-            .setClaims(valueMap) // 사용자 정보 추가
-            .setIssuedAt(Date.from(ZonedDateTime.now().toInstant())) // 발급시간
-            .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant())) // 만료시간
-            .signWith(key) // 서명추가
-            .compact();
-    return jwtStr;
+
 
   }
 
@@ -44,19 +44,19 @@ public class JWTUtil {
   // 파싱 : 데이터를 분석하고 분해해서 원하는 형태로 변환하는 과정
   public static Map<String, Object> validateToken(String token) {
 
-    Map<String, Object> claim = null;
+//    Map<String, Object> claim = null;
     
     try {
 
       // HMAC-SHA 알고리즘을 이용하여 비밀키 생성 -> UTF-8형식으로 변환
-      SecretKey key =Keys.hmacShaKeyFor(JWTUtil.key.getBytes("UTF-8"));
+//      SecretKey key =Keys.hmacShaKeyFor(JWTUtil.key.getBytes("UTF-8"));
 
-      claim = Jwts.parserBuilder() // 분해 해서 분석
-              .setSigningKey(key) // 서명 검증
+      return  Jwts.parserBuilder() // 분해 해서 분석
+              .setSigningKey(key) // 서명 검증 SecretKey 직접 사용
               .build()
               .parseClaimsJws(token) // 파싱 및 검증, 실패 시 에러
               .getBody();
-      
+
       
     } catch (MalformedJwtException malformedJwtException) { // jwt 형식이 올바르지 않음
       throw new CustomJWTException("MalFormed") ;
@@ -70,7 +70,7 @@ public class JWTUtil {
       throw new CustomJWTException("Error") ;
     }
     
-    return claim;
+    
 
   }
 

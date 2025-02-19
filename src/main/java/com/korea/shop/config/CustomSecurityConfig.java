@@ -59,9 +59,18 @@ public class CustomSecurityConfig {
 
         // 4) 로그인 방식, 페이지 설정
         http.formLogin( config -> {
-            config.loginPage("/api/member/login"); // 로그인 페이지 - 서버 경로
+            /*config.loginPage("/api/members/login"); // 로그인 페이지 - 서버 경로
+            config.loginProcessingUrl("/api/member/login") // 로그인 페이지 - 서버 경로 - post방식
+            config.usernameParameter("username").passwordParameter("password");
             config.successHandler(new APILoginSuccessHandler()); // 로그인 성공 처리
-            config.failureHandler(new APILoginFailHandler()); // 로그인 실패 처리
+            config.failureHandler(new APILoginFailHandler()); // 로그인 실패 처리*/
+            
+            
+            config.loginPage("/api/members/login") // 로그인 페이지 - 서버 경로
+            .loginProcessingUrl("/api/members/login") // 로그인 페이지 - 서버 경로 - post방식
+            .usernameParameter("username").passwordParameter("password") // 파라미터명 이름 설정
+            .successHandler(new APILoginSuccessHandler()) // 로그인 성공 처리
+            .failureHandler(new APILoginFailHandler()); // 로그인 실패 처리
         }); // 일반적은 form로
 
         // http.authorizeHttpRequests(); // url 패턴별 인증,권한 설정
@@ -72,14 +81,22 @@ public class CustomSecurityConfig {
 
         // http.logout();
         
-        // 5) JWT 인증 필터 추가 - UsernamePasswordAuthenticationFilter 실행전에 JWTCheckFilter가 실행됨
-        http.addFilterBefore(new JWTCheckFilter(),
-                UsernamePasswordAuthenticationFilter.class);// JWT 체크
+        
 
-        // 6) 접근거부 예외처리 핸들러 등록
+        // 5) 접근거부 예외처리 핸들러 등록
         http.exceptionHandling(config ->{
            config.accessDeniedHandler(new CustomAccessDeniedHandler());
         });
+        
+        /*// 6) 로그인 요청 모두 허용
+        http.authorizeHttpRequests(auth ->{
+            auth.requestMatchers("/api/members/login").permitAll(); // 로그인 요청 허용
+            auth.anyRequest().authenticated(); // 다른 요청은 인증필요
+        });*/
+
+        // 6) JWT 인증 필터 추가 - UsernamePasswordAuthenticationFilter 실행전에 JWTCheckFilter가 실행됨
+        http.addFilterBefore(new JWTCheckFilter(),
+                UsernamePasswordAuthenticationFilter.class);// JWT 체크
         
         return http.build();
     }
