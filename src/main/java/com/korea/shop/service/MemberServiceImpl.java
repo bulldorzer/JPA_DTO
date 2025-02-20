@@ -2,6 +2,7 @@ package com.korea.shop.service;
 
 import com.korea.shop.domain.Address;
 import com.korea.shop.domain.Member;
+import com.korea.shop.domain.MemberRole;
 import com.korea.shop.dto.MemberDTO;
 import com.korea.shop.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,14 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Long saveMember(MemberDTO memberDTO) {
         validateDuplicateMember(memberDTO); // 중복 회원 검증 로직 실행
-        Member member = modelMapper.map(memberDTO, Member.class);
+        Member member = Member.builder()
+                .email(memberDTO.getEmail())
+                .pw(memberDTO.getPw())
+                .name(memberDTO.getName())
+                .address(memberDTO.getAddress())
+                .memberRoleList(memberDTO.getRoleNames().stream()
+                        .map(MemberRole::valueOf)// String -> Enum으로 변환
+                        .collect(Collectors.toList())).build();
         memberRepository.save(member);
         return member.getId();
     }

@@ -19,6 +19,19 @@ public class MemberDTO extends User {
     
     private List<String> roleNames = new ArrayList<>(); // 권한 리스트 엔티티와 다름
     
+    // 기본 생성자
+    public MemberDTO (){
+        super("default", "1111", new ArrayList<>());
+    }
+    
+    public MemberDTO (String email, String pw, List<String> roleNames){
+        // user클래스 생성할때 ( 로그인아이디, 비밀번호, 역할 (ROLE_글자가 있어야함) )
+        super(email,pw,roleNames !=null 
+                ? roleNames.stream().map(str -> new SimpleGrantedAuthority("ROLE_"+str)).collect(Collectors.toList()) 
+                : new ArrayList<>() 
+        ); // 부모생성자호출
+    }
+    
     public MemberDTO(String email, String pw, String name, Address address, List<String> roleNames){
         // user클래스 생성할때 (로그인아이디, 비밀번호, 역할( ROLE_ 글자가 있어야 함 ))
         super(
@@ -48,6 +61,15 @@ public class MemberDTO extends User {
         dataMap.put("roleNames", roleNames);
 
         return dataMap;
+    }
+
+    // ✅ Security UserDetails 필드를 매핑하기 위한 setter 추가
+    public void setUsername(String username){
+        this.email = username; // 'User' 의 username 매핑
+    }
+
+    public void setPassword(String password){
+        this.pw = password; // 'User' 의 password 매핑
     }
 
 }
