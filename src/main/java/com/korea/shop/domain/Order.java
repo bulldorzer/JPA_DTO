@@ -21,7 +21,7 @@ public class Order {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST) // order의 배달주소, 상태가 바뀌면 delivery의 데이터 배달주소나 상태가 동시에 바뀜
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 

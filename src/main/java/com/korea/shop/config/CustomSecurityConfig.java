@@ -105,13 +105,16 @@ public class CustomSecurityConfig {
     @Bean
     public CorsConfigurationSource configurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
-        // originPattersn는 - 개발환경, 실제 리액트 배포 url을 작성한다.
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000")); // 리액트 서버
+        // orginPatterns은 개발환경, 실제 리액트 배포 url을 작성한다(=허용할 도메인,출저를 작성)
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000")); // 리액트 서버요청만 허용
+        // 도메인에서 허용할 메서드 설정
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
+        // 허용할 헤더 내용
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-        configuration.setAllowCredentials(true); //  쿠키 인증 포함 정보
+        //  자격 증명 허용
+        configuration.setAllowCredentials(true); 
 
-        // cors 설정 적용한 url patter 지정하는 객체 생성
+        // cors 설정 적용한 url pattern 지정하는 객체 생성
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // 서버 내 모든 경로에 설정 적용
         return source;

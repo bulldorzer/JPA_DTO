@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
+@Getter @Setter
 @Builder // 객체생성+초기화
 @ToString(exclude = "memberRoleList")// ToString 메서드에서 memberRoleList 제외
 public class Member {

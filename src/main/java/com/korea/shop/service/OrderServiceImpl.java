@@ -78,9 +78,9 @@ public class OrderServiceImpl implements OrderService {
         OrderItem orderItem = orderItemRepository.findById(orderItemId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 주문 아이템 없음"));
 
-        orderItem.cancel();
-        orderItem.setOrder(null);  // ✅ 관계 해제
-        orderItemRepository.delete(orderItem);
+        orderItem.cancel();         // 주문서 아이템을 삭제하면서 item 테이블의 수량을 하나 올려줌
+        orderItem.setOrder(null);   // ✅ 관계 해제 주문서에 등록된 item 하나의 튜플의 관계를 없앰
+        orderItemRepository.delete(orderItem); // 주문서에 등록된 주문 취소할 아이템을 삭제
     }
 
     // 전체 주문 취소
