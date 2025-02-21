@@ -13,6 +13,7 @@ public class OrderDTO {
     private Long orderId;
     private String name;
 
+    // 날짜 데이터, 형식지정
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime orderDate;
 

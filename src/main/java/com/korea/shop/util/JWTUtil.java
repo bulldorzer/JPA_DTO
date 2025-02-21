@@ -3,13 +3,16 @@ package com.korea.shop.util;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 @Log4j2
+@Component // 컨테이너가 관리하는 클래스 : 의존성 주입이 가능해짐
 public class JWTUtil {
 
   // 시크릿 키 설정 (32bit 이상 필요)
@@ -17,19 +20,24 @@ public class JWTUtil {
   private static final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
   // JWT 생성 메서드
-  // valueMap : 사용자 정보, min: 토큰 유효시간
-  public static String generateToken(Map<String, Object> valueMap, int min) {
+  // valueMap : 사용자 정보, min: 토큰 유효시간 -> claims로 바뀜
+  // new HashMqp<>(claims)을 사용하면, 새로운 객체를 생성하여 원본 claims와 분리되므로 예외를 방지할 수 있음.
+  public static String generateToken(String username, Map<String, Object> claims, int min) {
 
     try {
       // HMAC-SHA 알고리즘을 이용하여 비밀키 생성 -> UTF-8형식으로 변환
 //      key = Keys.hmacShaKeyFor(JWTUtil.key.getBytes("UTF-8"));
+      
+
       // 토큰 객체 생성
       String jwtStr = Jwts.builder() // JWT API를 통해 가져온 Jwts 객체
               .setHeader(Map.of("typ","JWT")) // 헤더 설정
-              .setClaims(valueMap) // 사용자 정보 추가
+//              .setClaims(valueMap) // 사용자 정보 추가
+              .setClaims(new HashMap<>(claims)) // 사용자 정보 추가 위보다 안정적
+              .setSubject(username)
               .setIssuedAt(Date.from(ZonedDateTime.now().toInstant())) // 발급시간
               .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant())) // 만료시간
-              .signWith(key) // SecretKey 사용
+              .signWith(key) // ✅ SecretKey 사용
               .compact();
       return jwtStr;
     }catch (Exception e){
@@ -40,9 +48,10 @@ public class JWTUtil {
 
   }
 
-  // 토큰 유효성 검사
+  // 토큰 유효성 검사 (검증 메서드)
   // 파싱 : 데이터를 분석하고 분해해서 원하는 형태로 변환하는 과정
-  public static Map<String, Object> validateToken(String token) {
+  // 반환형 : Claims로 변경 (JWT 라이브러리는 Claims 객체를 반환함)
+  public static Claims validateToken(String token) {
 
 //    Map<String, Object> claim = null;
     

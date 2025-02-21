@@ -22,7 +22,9 @@ public class MemberController {
     }
 
     // 특정 회원 조회 (ID 기준)
-    @GetMapping("/{id}")
+    // /api/members/login 접속하게 되면 아래의 메서드에 매핑 될 수 없다 --> 에러
+    // /api/members/id/3 -- 이렇게 처리
+    @GetMapping("/id/{id}")
     public ResponseEntity<MemberDTO> getMember(@PathVariable Long id) {
         return ResponseEntity.ok(memberService.getMember(id));
     }

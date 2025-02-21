@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @DiscriminatorValue("A") // 구분자컬럼에 저장되는 값 - DTYPE에 A 저장됨
 @Getter
 @Setter
-@SuperBuilder
+@SuperBuilder // 상속관계에서 빌더패턴 만들때
 @NoArgsConstructor
 public class Album extends Item {
     private String artist;

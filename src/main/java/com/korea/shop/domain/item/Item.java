@@ -17,7 +17,7 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) // 상속 관리 전략 - 단일테이블로 관리
 @DiscriminatorColumn(name = "DTYPE") // 싱글테이블 전략일 때만 사용함 - 구분자 컬럼
 @Getter @Setter
-@SuperBuilder
+@SuperBuilder // 상속관계에서 빌더패턴 만들때
 @NoArgsConstructor
 public class Item {
 

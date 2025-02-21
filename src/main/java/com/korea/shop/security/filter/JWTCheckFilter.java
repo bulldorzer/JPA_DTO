@@ -66,6 +66,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             Map<String, Object> claims = JWTUtil.validateToken(accessToken); //통과되지 않았으면 예외발생
 
 
+
             String email = (String) claims.get("email");
             String name = (String) claims.get("name");
             String pw = (String) claims.get("pw");

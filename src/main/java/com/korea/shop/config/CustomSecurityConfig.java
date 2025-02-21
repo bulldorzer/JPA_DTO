@@ -45,59 +45,34 @@ public class CustomSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
 
-        // 1) cors 설정
-        http.cors(httpSecurityCorsConfigurer -> {
-            httpSecurityCorsConfigurer.configurationSource(configurationSource());
-        });
-
-        // 2) 세션 사용 - 안함
-        http.sessionManagement(sessionConfig ->
-                sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        // 3) csrf 설정 비활성활
-        http.csrf( config-> config.disable());
-
-        // 4) 로그인 방식, 페이지 설정
-        http.formLogin( config -> {
-            /*config.loginPage("/api/members/login"); // 로그인 페이지 - 서버 경로
-            config.loginProcessingUrl("/api/member/login") // 로그인 페이지 - 서버 경로 - post방식
-            config.usernameParameter("username").passwordParameter("password");
-            config.successHandler(new APILoginSuccessHandler()); // 로그인 성공 처리
-            config.failureHandler(new APILoginFailHandler()); // 로그인 실패 처리*/
-            
-            
-            config.loginPage("/api/members/login") // 로그인 페이지 - 서버 경로
-            .loginProcessingUrl("/api/members/login") // 로그인 페이지 - 서버 경로 - post방식
-            .usernameParameter("username").passwordParameter("password") // 파라미터명 이름 설정
-            .successHandler(new APILoginSuccessHandler()) // 로그인 성공 처리
-            .failureHandler(new APILoginFailHandler()); // 로그인 실패 처리
-        }); // 일반적은 form로
-
-        // http.authorizeHttpRequests(); // url 패턴별 인증,권한 설정
 
 
-        // http.httpBasic(); // HTTP Basic 인증 (Authorization 헤더에 Basic base64(ID:PW))
-        // http.oauth2Login(); // 소셜 로그인 방식
+        log.info("===================<Security Config>=======================");
 
-        // http.logout();
-        
-        
+        // 메서드 체인 으로 연결법
+        // cors -> csrf 비활성화 -> 세션 사용x (반드신 필터 설정 전에 와야 함)
+        // 로그인 설정(폼설정)
+        // JWT 필터 설정 ( 로그인 필터 )
+        // 예외처리 핸들러 ( 필터 적용 후 설정)
+        // 권한 및 URL 접근 제어 가장 마지막에 배치
 
-        // 5) 접근거부 예외처리 핸들러 등록
-        http.exceptionHandling(config ->{
-           config.accessDeniedHandler(new CustomAccessDeniedHandler());
-        });
-        
-        /*// 6) 로그인 요청 모두 허용
-        http.authorizeHttpRequests(auth ->{
-            auth.requestMatchers("/api/members/login").permitAll(); // 로그인 요청 허용
-            auth.anyRequest().authenticated(); // 다른 요청은 인증필요
-        });*/
+        // http.메서드().메서드().메서드(); 메서드 체인 이라고함 => 메서드로 이어지는 코딩
 
-        // 6) JWT 인증 필터 추가 - UsernamePasswordAuthenticationFilter 실행전에 JWTCheckFilter가 실행됨
-        http.addFilterBefore(new JWTCheckFilter(),
-                UsernamePasswordAuthenticationFilter.class);// JWT 체크
-        
+        // cors -> csrf 비활성화 -> 세션 사용x (반드신 필터 설정 전에 와야 함)
+        http.cors(
+                        httpSecurityCorsConfigurer
+                                -> httpSecurityCorsConfigurer.configurationSource(configurationSource()))
+                .csrf( config -> config.disable())
+                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class)// 여기가 순서 제일 중요
+                .exceptionHandling(config -> config.accessDeniedHandler(new CustomAccessDeniedHandler()))
+                // url 접근 제어 허용 가능한 url 등록
+                .authorizeHttpRequests( atuhz -> {
+                   atuhz
+                           .requestMatchers("/api/members/login").permitAll() // 로그인 화면
+                           .requestMatchers("/api/itmes").permitAll() //  상품목록
+                           .anyRequest().authenticated();
+                });
         return http.build();
     }
 

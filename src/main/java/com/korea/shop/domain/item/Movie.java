@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @DiscriminatorValue("M") // 구분자컬럼 - DTYPE에 M 저장됨
 @Getter
 @Setter
-@SuperBuilder
+@SuperBuilder // 상속관계에서 빌더패턴 만들때
 @NoArgsConstructor
 public class Movie extends Item{
     private String director;
