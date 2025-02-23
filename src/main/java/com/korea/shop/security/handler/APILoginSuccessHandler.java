@@ -6,6 +6,7 @@ import com.korea.shop.util.JWTUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -16,7 +17,10 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 @Log4j2
+@RequiredArgsConstructor
 public class APILoginSuccessHandler implements AuthenticationSuccessHandler{
+
+  private final JWTUtil jwtUtil;
 
 @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -34,9 +38,12 @@ public class APILoginSuccessHandler implements AuthenticationSuccessHandler{
     
     // 사용자 정보 map 형식 변환
     Map<String, Object> claims = memberDTO.getClaims();
+    String username = memberDTO.getUsername(); // 이부분 내가 수정함 02-21
 
-    String accessToken = JWTUtil.generateToken(claims, 10); // 최초 생성 토큰 유효시간 10분
-    String refreshToken = JWTUtil.generateToken(claims,60*24); // 갱신할때 사용 24시간
+    // 최초 생성 토큰 유효시간 10분 | 이부분 내가 수정함 02-21
+    String accessToken = JWTUtil.generateToken(username, claims, 10);
+    // 갱신할때 사용 24시간 | 이부분 내가 수정함 02-21
+    String refreshToken = JWTUtil.generateToken(username, claims,60*24);
 
     // 토큰 데이터 추가
     claims.put("accessToken", accessToken); // 승인토큰
