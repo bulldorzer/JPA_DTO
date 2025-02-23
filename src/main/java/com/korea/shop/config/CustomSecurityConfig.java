@@ -71,7 +71,7 @@ public class CustomSecurityConfig {
                    atuhz
                            .requestMatchers("/api/members/login").permitAll() // 로그인 화면
                            .requestMatchers("/api/itmes").permitAll() //  상품목록
-                           .anyRequest().authenticated();
+                           .anyRequest().authenticated(); // 다른 요청은 인증 필요
                 });
         return http.build();
     }

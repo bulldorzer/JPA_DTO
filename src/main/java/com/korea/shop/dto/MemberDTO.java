@@ -51,7 +51,7 @@ public class MemberDTO extends User {
 
     }
 
-    // DTO 데이터 -> MAP 형태로 사용할 수 있도록 변환하는 메서드
+    // DTO 데이터 -> MAP 형태로 사용할 수 있도록 변환하는 메서드, 토큰 변환에 필요함 DTO -> Map -> JSON 형식
     public Map<String,Object> getClaims(){
 
         Map<String, Object> dataMap = new HashMap<>();

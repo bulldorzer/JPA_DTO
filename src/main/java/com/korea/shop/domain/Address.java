@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Embeddable
+@Embeddable // 포함되는 클래스에 적어주어야 하는 어노테이션
 public class Address {
 
     @Column(nullable = true)
