@@ -1,7 +1,6 @@
 package com.korea.shop.dto;
 
 import com.korea.shop.domain.Address;
-import com.korea.shop.domain.Member;
 import lombok.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -10,38 +9,46 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter@Setter
-//@ToString(exclude = "pw")
-@AllArgsConstructor
-@NoArgsConstructor
-//public class MemberDTO extends User {
-public class MemberDTO {
+@ToString(exclude = "pw")
+public class MemberDTO extends User {
     private Long id;
     private String name;
     private String email; // 로그인 아이디의 역할
     private String pw; // 비밀번호
     private Address address;
-    
+
     private List<String> roleNames = new ArrayList<>(); // 권한 리스트 엔티티와 다름
-    
-    public MemberDTO(Member member){
-        this.id = member.getId();
-        this.name = member.getName();
-        this.email = member.getEmail();
-        this.pw = member.getPw();
-        this.address = member.getAddress();
-        this.roleNames = (member.getMemberRoleList()==null) 
-                                ? new ArrayList<>() 
-                                : member.getMemberRoleList().stream()
-                                .map(Enum::name)// Enum타입을 String 타입으로 변환
-                                .collect(Collectors.toList());
+
+    // 기본 생성자
+    public MemberDTO (){
+        super("default", "1111", new ArrayList<>());
+    }
+
+    public MemberDTO (String email, String pw, List<String> roleNames){
+        // user클래스 생성할때 ( 로그인아이디, 비밀번호, 역할 (ROLE_글자가 있어야함) )
+        super(email,pw,roleNames !=null
+                ? roleNames.stream().map(str -> new SimpleGrantedAuthority("ROLE_"+str)).collect(Collectors.toList())
+                : new ArrayList<>()
+        ); // 부모생성자호출
     }
 
     public MemberDTO(String email, String pw, String name, Address address, List<String> roleNames){
+        // user클래스 생성할때 (로그인아이디, 비밀번호, 역할( ROLE_ 글자가 있어야 함 ))
+        super(
+                email,
+                pw,
+                roleNames.stream().map(str->new
+                        SimpleGrantedAuthority("ROLE_"+str)).collect(Collectors.toList())
+
+        );
+
         this.email = email;
-        this.pw = pw;
+//        this.pw = pw;
         this.name = name;
         this.address = address;
         this.roleNames = roleNames;
+
+
     }
 
     // DTO 데이터 -> MAP 형태로 사용할 수 있도록 변환하는 메서드, 토큰 변환에 필요함 DTO -> Map -> JSON 형식
@@ -56,13 +63,13 @@ public class MemberDTO {
         return dataMap;
     }
 
-//    // ✅ Security UserDetails 필드를 매핑하기 위한 setter 추가
-//    public void setUsername(String username){
-//        this.email = username; // 'User' 의 username 매핑
-//    }
-//
-//    public void setPassword(String password){
-//        this.pw = password; // 'User' 의 password 매핑
-//    }
+    // ✅ Security UserDetails 필드를 매핑하기 위한 setter 추가
+    public void setUsername(String username){
+        this.email = username; // 'User' 의 username 매핑
+    }
+
+    public void setPassword(String password){
+        this.pw = password; // 'User' 의 password 매핑
+    }
 
 }

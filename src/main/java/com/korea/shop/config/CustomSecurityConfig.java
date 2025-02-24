@@ -4,10 +4,13 @@ import com.korea.shop.security.filter.JWTCheckFilter;
 import com.korea.shop.security.handler.APILoginFailHandler;
 import com.korea.shop.security.handler.APILoginSuccessHandler;
 import com.korea.shop.security.handler.CustomAccessDeniedHandler;
+import com.korea.shop.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,6 +29,13 @@ import java.util.Arrays;
 @Log4j2
 @EnableMethodSecurity
 public class CustomSecurityConfig {
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    private final JWTUtil jwtUtil;
     /*
     SecurityFilterChain
     - 보안게이트(경비시스템)
@@ -50,29 +60,32 @@ public class CustomSecurityConfig {
         log.info("===================<Security Config>=======================");
 
         // 메서드 체인 으로 연결법
-        // cors -> csrf 비활성화 -> 세션 사용x (반드신 필터 설정 전에 와야 함)
-        // 로그인 설정(폼설정)
-        // JWT 필터 설정 ( 로그인 필터 )
-        // 예외처리 핸들러 ( 필터 적용 후 설정)
-        // 권한 및 URL 접근 제어 가장 마지막에 배치
-
         // http.메서드().메서드().메서드(); 메서드 체인 이라고함 => 메서드로 이어지는 코딩
 
-        // cors -> csrf 비활성화 -> 세션 사용x (반드신 필터 설정 전에 와야 함)
+        // CORS 설정: 다른 도메인에서 요청 가능하도록 설정
         http.cors(
                         httpSecurityCorsConfigurer
                                 -> httpSecurityCorsConfigurer.configurationSource(configurationSource()))
-                .csrf( config -> config.disable())
+                // 세션 사용 X
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class)// 여기가 순서 제일 중요
-                .exceptionHandling(config -> config.accessDeniedHandler(new CustomAccessDeniedHandler()))
                 // url 접근 제어 허용 가능한 url 등록
                 .authorizeHttpRequests( atuhz -> {
-                   atuhz
-                           .requestMatchers("/api/members/login").permitAll() // 로그인 화면
-                           .requestMatchers("/api/itmes").permitAll() //  상품목록
-                           .anyRequest().authenticated(); // 다른 요청은 인증 필요
-                });
+                    atuhz
+                            .requestMatchers("/api/members/login").permitAll() // 로그인 화면
+                            .requestMatchers("/api/orders").hasRole("USER") //  주문목록
+                            .requestMatchers("/api/deliveries").hasRole("USER") //  상품목록
+                            .anyRequest().authenticated(); // 다른 요청은 인증 필요
+                })
+                // JWT 필터 설정 ( 로그인 필터 )
+                .addFilterBefore(new JWTCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)// 여기가 순서 제일 중요
+                // cors -> csrf 비활성화 -> 세션 사용x (반드신 필터 설정 전에 와야 함)
+                .csrf( config -> config.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                // 로그인 설정(폼설정)
+                .formLogin(form -> form.disable())
+                // 예외처리 핸들러 ( 필터 적용 후 설정)
+                .exceptionHandling(config -> config.accessDeniedHandler(new CustomAccessDeniedHandler()));
+
         return http.build();
     }
 

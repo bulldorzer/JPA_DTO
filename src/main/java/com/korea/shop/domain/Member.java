@@ -51,4 +51,8 @@ public class Member {
         this.email = email;
     }
 
+    public void changeAddress(Address address){
+        this.address = address;
+    }
+
 }

@@ -10,12 +10,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 
-/**
+/*
+ * UserDetailsService
+ * 사용자 인증 조회 인터 페이스
+ * 
  * CustomUSerDetailsService
- * 사용자의 인증 처리를 하기 위함
+ * 사용자의 인증 조회 구현을 하기 위함
  */
 @Service
 @Log4j2
@@ -25,28 +29,18 @@ public class CustomUserDetailsService  implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        Member member = memberRepository.getWithRoles(username);
+        Member member = memberRepository.getWithRoles(email)
+                .orElseThrow(()-> new UsernameNotFoundException("사용자를 찾을 수 없음: "+ email)); // null이 발생할수 있으므로 예외처리
 
         log.info("---------------<loadUserByUsername>---------------");
-        log.info(username);
-        if (member == null){
-            log.error("User not Found: "+ username);
-            throw new UsernameNotFoundException("User with email "+username+"Not Found"); // 명확한 메세지 제공
-        }
 
-        // MemberDTO 타입으로 반환
-        MemberDTO memeberDTO = new MemberDTO(
-                member.getEmail(),
-                member.getPw(),
-                member.getName(),
-                member.getAddress(),
-                member.getMemberRoleList().stream().map(memberRole
-                        -> memberRole.name()).collect(Collectors.toList())
-        );
-
-        log.info("memeberDTO: "+memeberDTO);
-        return memeberDTO;
+//        List<String> roleNmaes = member.getMemberRoleList()
+//                .stream()
+//                .map(Enum::name)// String 으로 변환
+//                .collect(Collectors.toList());
+        
+        return new MemberDetails(member);
     }
 }

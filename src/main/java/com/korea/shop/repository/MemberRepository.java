@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
@@ -17,7 +18,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     */
     @EntityGraph(attributePaths =  {"memberRoleList"}) // memberRoleList 즉시로딩함. // 객체 형식으로 가져옴
     @Query("select m from Member m where m.email = :email")
-    Member getWithRoles(@Param("email") String email);
+    Optional<Member> getWithRoles(@Param("email") String email);
 
     public List<Member> findByName(String name);
 
