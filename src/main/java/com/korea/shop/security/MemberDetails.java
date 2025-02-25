@@ -34,7 +34,8 @@ public class MemberDetails implements UserDetails {
         this.address = member.getAddress();
         this.name = member.getName();
         // SimpleGrantedAuthority 사용자 권한을 문자열로 저장하는 클래스
-        this.authorities = member.getMemberRoleList().stream().map(role-> new SimpleGrantedAuthority("ROLE_"+role))
+        this.authorities = member.getMemberRoleList().stream()
+                .map(role-> new SimpleGrantedAuthority("ROLE_"+role))
                 .collect(Collectors.toList());
     }
 
