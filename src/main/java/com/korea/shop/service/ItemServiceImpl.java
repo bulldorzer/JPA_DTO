@@ -4,14 +4,19 @@ import com.korea.shop.domain.item.Album;
 import com.korea.shop.domain.item.Book;
 import com.korea.shop.domain.item.Item;
 import com.korea.shop.domain.item.Movie;
+import com.korea.shop.dto.CustomPage;
 import com.korea.shop.dto.ItemDTO;
 import com.korea.shop.repository.ItemRepository;
+import com.korea.shop.util.NoDataFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -69,6 +74,35 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAll().stream()
                 .map( item -> modelMapper.map(item, ItemDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    // 페이징 처리 아직 작업 안끝남
+    @Override
+    public CustomPage<ItemDTO> getAllItemsPaged(Pageable pageable) {
+
+        Page<Item> itemPage = itemRepository.findAll(pageable); // Optional 자료형
+
+        // 예외처리 구문
+        if (itemPage.isEmpty()){
+            throw new NoDataFoundException("조회된 데이터가 없습니다.");
+        }
+        Page<ItemDTO> dtoPage= itemPage.map(item -> modelMapper.map(item, ItemDTO.class));
+
+        // DTO에 페이지네이션 정보 추가 ( 별도의 DTO 만들기)
+        int groupSize = 10; // 한그룹의 표시할 페이지 개수 10개
+        return CustomPage.of(dtoPage, groupSize);
+    }
+
+    private List<Integer> getPaginationRange(int currentPage, int totalPages, int groupSize){
+        int currentGroup = (currentPage/groupSize) * groupSize;
+        int startPage = currentPage-1;
+        int endPage = Math.min(startPage + groupSize -1, totalPages);
+
+        return IntStream.rangeClosed(startPage, endPage)
+                .boxed()
+                .collect(Collectors.toList());
+
+
     }
 
     @Override

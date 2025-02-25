@@ -1,8 +1,12 @@
 package com.korea.shop.controller;
 
+import com.korea.shop.dto.CustomPage;
 import com.korea.shop.dto.ItemDTO;
 import com.korea.shop.service.ItemService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.query.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -15,15 +19,21 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    @PreAuthorize("hasAnyRole('ROLE_USER')") // 예시
-    @GetMapping
-    public ResponseEntity<List<ItemDTO>> getAllItems() {
-        return ResponseEntity.ok(itemService.getAllItems());
-    }
+//    @PreAuthorize("hasAnyRole('ROLE_USER')") // 예시
+//    @GetMapping
+//    public ResponseEntity<List<ItemDTO>> getAllItems(@PageableDefault) {
+//        return ResponseEntity.ok(itemService.getAllItems());
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ItemDTO> getItem(@PathVariable Long id) {
         return ResponseEntity.ok(itemService.getItem(id));
+    }
+
+    // 페이징 처리
+    @GetMapping("/list")
+    public ResponseEntity<CustomPage<ItemDTO>> getAllItems(@PageableDefault(page = 0, size = 3) Pageable pageable){
+        return ResponseEntity.ok(itemService.getAllItemsPaged(pageable));
     }
 
     @PostMapping

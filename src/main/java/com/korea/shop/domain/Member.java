@@ -26,8 +26,6 @@ public class Member {
     @Embedded // 값 타입 포함
     private Address address;
 
-    //    @OneToMany(mappedBy = "member") // 연결관계 - 거울 설정 (양방향)
-    //    private List<Order> orders = new ArrayList<>();
     @ElementCollection(fetch = FetchType.LAZY)// 지연로딩, 필요시 추가 데이터 생성
     @Builder.Default // 빌더를 사용할 때, 필드의 기본값 유지, 안하면 null 초기화함.
     private List<MemberRole> memberRoleList = new ArrayList<>();
@@ -46,11 +44,9 @@ public class Member {
     public void changePw(String pw){
         this.pw = pw;
     }
-
     public void changeEmail(String email){
         this.email = email;
     }
-
     public void changeAddress(Address address){
         this.address = address;
     }

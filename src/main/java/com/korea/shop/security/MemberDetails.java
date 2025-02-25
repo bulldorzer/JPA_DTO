@@ -33,6 +33,7 @@ public class MemberDetails implements UserDetails {
         this.password = member.getPw();
         this.address = member.getAddress();
         this.name = member.getName();
+        // SimpleGrantedAuthority 사용자 권한을 문자열로 저장하는 클래스
         this.authorities = member.getMemberRoleList().stream().map(role-> new SimpleGrantedAuthority("ROLE_"+role))
                 .collect(Collectors.toList());
     }
@@ -48,7 +49,7 @@ public class MemberDetails implements UserDetails {
         this.address = address;
     }
 
-    // MemberDetails -> MemberDTO로 변환 메서드
+    // MemberDetails -> MemberDTO로 변환하는 메서드
     /*
     *  GrantedAuthority 데이터 형태는 ROLE_USER, ROLE_ADMIN
     */

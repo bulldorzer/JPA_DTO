@@ -1,8 +1,6 @@
 package com.korea.shop.config;
 
 import com.korea.shop.security.filter.JWTCheckFilter;
-import com.korea.shop.security.handler.APILoginFailHandler;
-import com.korea.shop.security.handler.APILoginSuccessHandler;
 import com.korea.shop.security.handler.CustomAccessDeniedHandler;
 import com.korea.shop.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +26,9 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 @Log4j2
 @EnableMethodSecurity
+/*
+* 보안 설정
+*/
 public class CustomSecurityConfig {
 
     @Bean
@@ -72,16 +73,19 @@ public class CustomSecurityConfig {
                 .authorizeHttpRequests( atuhz -> {
                     atuhz
                             .requestMatchers("/api/members/login").permitAll() // 로그인 화면
-                            .requestMatchers("/api/orders").hasRole("USER") //  주문목록
-                            .requestMatchers("/api/deliveries").hasRole("USER") //  상품목록
+                            .requestMatchers("/api/items/**").permitAll() //  상품목록
+                            .requestMatchers("/api/orders/**").hasRole("USER") //  주문목록
+                            .requestMatchers("/api/deliveries/**").hasRole("USER") // 배달여부
+                            .requestMatchers("/api/admin/**").hasAnyRole("MANAGER", "ADMIN") // 관리자 화면
                             .anyRequest().authenticated(); // 다른 요청은 인증 필요
+                    // hasRole 권한 한개 지정, hasAnyRole 권한 여러개 지정
                 })
                 // JWT 필터 설정 ( 로그인 필터 )
                 .addFilterBefore(new JWTCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)// 여기가 순서 제일 중요
                 // cors -> csrf 비활성화 -> 세션 사용x (반드신 필터 설정 전에 와야 함)
                 .csrf( config -> config.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
-                // 로그인 설정(폼설정)
+                // 로그인 설정 (폼 로그인 & HTTP Basic 인증 비활성화 => JWT 기반 로그인 사용)
                 .formLogin(form -> form.disable())
                 // 예외처리 핸들러 ( 필터 적용 후 설정)
                 .exceptionHandling(config -> config.accessDeniedHandler(new CustomAccessDeniedHandler()));
