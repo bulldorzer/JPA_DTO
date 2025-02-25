@@ -124,7 +124,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             printWriter.println(msg); // 클라이언트에게 반환
             printWriter.close(); // 출력 닫음, 토큰 반환
         }
-        
+        // 커밋테스트
         
     }
 }
