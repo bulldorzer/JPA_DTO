@@ -88,8 +88,6 @@ public class JWTUtil {
     } catch (Exception e){ // 기타 알수 없는 예외
       throw new CustomJWTException("Error") ;
     }
-    
-    
 
   }
 

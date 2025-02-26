@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * 사용자 인증 조회 인터 페이스
  * 
  * CustomUSerDetailsService
- * 사용자의 인증 조회 구현을 하기 위함
+ * 사용자의 인증 조회 구현을 하기 위한 클래스
  */
 @Service
 @Log4j2
