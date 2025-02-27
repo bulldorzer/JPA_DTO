@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
+// JpaRepository<엔티티, PK자료형>
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     // 특정 주문서의 모든 주문 아이템 조회

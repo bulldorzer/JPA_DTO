@@ -119,23 +119,9 @@ public class AuthController {
         return Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken);
     }
 
-    // 시간이 1시간 미만으로 남았다면
-//    private boolean checkTime(Long exp){ // 밀리세컨트 time데이터임
-//
-//
-//
-//        // 현재 시간과의 차이 계산 - 밀리세컨즈(현재시간)
-//        long gap = exp - System.currentTimeMillis();
-//
-//        // 분단위 계산
-//        long leftMin = gap / (1000*60);
-//
-//        // 1시간 미만으로 남았는지
-//        return leftMin < 60;
-//    }
 
-    // 토큰이 만료 되었는지 확인
     private boolean CheckExpiredToken(String token) {
+        // 토큰이 만료 되었는지 확인
 
         try {
             jwtUtil.validateToken(token);
@@ -147,6 +133,19 @@ public class AuthController {
         }
 
     }
+
+    // 시간이 1시간 미만으로 남았다면
+//    private boolean checkTime(Long exp){ // 밀리세컨트 time데이터임
+//
+//        // 현재 시간과의 차이 계산 - 밀리세컨즈(현재시간)
+//        long gap = exp - System.currentTimeMillis();
+//
+//        // 분단위 계산
+//        long leftMin = gap / (1000*60);
+//
+//        // 1시간 미만으로 남았는지
+//        return leftMin < 60;
+//    }
 
     private boolean checkTime(Integer exp) {
         Date expDate = new Date((long) exp * 1000);

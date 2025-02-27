@@ -9,6 +9,7 @@ import com.korea.shop.dto.ItemDTO;
 import com.korea.shop.repository.ItemRepository;
 import com.korea.shop.util.NoDataFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -76,7 +78,6 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
     }
 
-    // 페이징 처리 아직 작업 안끝남
     @Override
     public CustomPage<ItemDTO> getAllItemsPaged(Pageable pageable) {
 
@@ -87,6 +88,8 @@ public class ItemServiceImpl implements ItemService {
             throw new NoDataFoundException("조회된 데이터가 없습니다.");
         }
         Page<ItemDTO> dtoPage= itemPage.map(item -> modelMapper.map(item, ItemDTO.class));
+        log.info("------------Item toPage------------");
+        log.info(dtoPage.getContent());
 
         // DTO에 페이지네이션 정보 추가 ( 별도의 DTO 만들기)
         int groupSize = 10; // 한그룹의 표시할 페이지 개수 10개

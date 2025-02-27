@@ -1,0 +1,13 @@
+public CustomPage<ItemDTO> getAllItemsPaged(Pageable pageable) {
+        Page<Item> itemPage = itemRepository.findAll(pageable); // 엔티티 조회
+        if (itemPage.isEmpty()) {
+            throw new NoDataFoundException("조회된 데이터가 없습니다.");
+        }
+
+        Page<ItemDTO> dtoPage = itemPage.map(item -> modelMapper.map(item, ItemDTO.class));
+        log.info("------------dtoPage------------");
+        log.info(dtoPage.getContent());
+
+        int groupSize = 10; // 한 그룹에 표시할 페이지 개수 (예: 10)
+        return CustomPage.of(dtoPage, groupSize);
+    }

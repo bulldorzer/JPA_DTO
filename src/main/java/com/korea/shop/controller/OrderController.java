@@ -1,10 +1,13 @@
 package com.korea.shop.controller;
 
+import com.korea.shop.dto.CustomPage;
 import com.korea.shop.service.OrderService;
 import com.korea.shop.domain.OrderItem;
 import com.korea.shop.dto.OrderDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,10 +23,11 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    // 전체 주문 조회
-    @GetMapping
-    public ResponseEntity<List<OrderDTO>> getOrders() {
-        return ResponseEntity.ok(orderService.getAllOrders());
+    // 전체 주문 조회 페이징 처리
+    @GetMapping("/list")
+    public ResponseEntity<CustomPage<OrderDTO>>
+    getOrders(@PageableDefault(page = 0, size = 3)Pageable pageable) {
+        return ResponseEntity.ok(orderService.getAllItemsPaged(pageable));
     }
 
     // 주문 생성

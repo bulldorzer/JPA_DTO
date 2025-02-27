@@ -1,5 +1,6 @@
 package com.korea.shop.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.korea.shop.domain.item.Item;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -21,7 +22,8 @@ public class Category {
     @OneToMany(mappedBy = "category")
     private List<CategoryItem> categoryItems = new ArrayList<>();
 
-    // 상위 카테고리
+    // 상위 카테고리 + 하위카테고리 : 양방향 관계 설정
+    @JsonIgnore // 무한루프 끊어줌 => JSON 직렬화에서 parent 제외하고 무한루프 방지
     @ManyToOne
     @JoinColumn(name="parent_id")
     private Category parent;
@@ -30,8 +32,13 @@ public class Category {
     @OneToMany(mappedBy = "parent")
     private List<Category> child = new ArrayList<>();
 
-    public void addChild(Category newChild){
-        this.child.add(newChild); // 하위 카테고리 리스트에 새로운 자식 카테고리 추가
-        newChild.setParent(this); // 변경된 this(=category) 로 다시 설정
-    }
+    /*
+    * 두개의 테이블이 양방향 관계이나
+    * 한 엔티티에 합치기 위함
+    * parent_id는 @id(PK)를 참조함
+    * 
+    * 
+    * 
+    */
+
 }

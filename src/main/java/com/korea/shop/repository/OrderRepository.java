@@ -3,6 +3,8 @@ package com.korea.shop.repository;
 import com.korea.shop.domain.Order;
 import com.korea.shop.domain.OrderStatus;
 import com.korea.shop.dto.OrderDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// JpaRepository<엔티티, PK자료형>
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
@@ -36,5 +39,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // ✅ EntityGraph를 활용한 Lazy Loading 최적화 (N+1 문제 해결)
     @EntityGraph(attributePaths = {"member", "delivery"})
-    List<Order> findAll();
+    @Query("SELECT o FROM Order o")
+    Page<Order> findAll(Pageable pageable);
 }

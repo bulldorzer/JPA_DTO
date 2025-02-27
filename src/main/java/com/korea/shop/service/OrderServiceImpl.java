@@ -2,13 +2,19 @@ package com.korea.shop.service;
 
 import com.korea.shop.domain.*;
 import com.korea.shop.domain.item.Item;
+import com.korea.shop.dto.CustomPage;
+import com.korea.shop.dto.ItemDTO;
 import com.korea.shop.dto.OrderDTO;
 import com.korea.shop.repository.ItemRepository;
 import com.korea.shop.repository.MemberRepository;
 import com.korea.shop.repository.OrderItemRepository;
 import com.korea.shop.repository.OrderRepository;
+import com.korea.shop.util.NoDataFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 @Transactional  // ✅ 클래스 레벨에서 전체 트랜잭션 적용
@@ -70,6 +77,21 @@ public class OrderServiceImpl implements OrderService {
                 .stream()
                 .map(order -> modelMapper.map(order, OrderDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public CustomPage<OrderDTO> getAllItemsPaged(Pageable pageable) {
+        Page<Order> orderPage = orderRepository.findAll(pageable);
+        if (orderPage.isEmpty()){
+            throw new NoDataFoundException("조회된 데이터가 없습니다.");
+        }
+        Page<OrderDTO> dtoPage = orderPage.map(order -> modelMapper.map(order, OrderDTO.class));
+        log.info("======<OrderDtoPage>======");
+        log.info(dtoPage.getContent());
+
+        // DTO에 페이지 네이션 정보 추가 (별도의 DTO 만들기)
+        int groupSize = 10;
+        return CustomPage.of(dtoPage, groupSize);
     }
 
     // 특정 주문 아이템 삭제 (취소)

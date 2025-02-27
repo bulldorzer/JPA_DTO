@@ -72,9 +72,10 @@ public class CustomSecurityConfig {
                 // url 접근 제어 허용 가능한 url 등록
                 .authorizeHttpRequests( atuhz -> {
                     atuhz
-                            .requestMatchers("/api/members/login").permitAll() // 로그인 화면
+//                            .requestMatchers("/api/members/login").permitAll() // 로그인 화면
                             .requestMatchers("/api/items/**").permitAll() //  상품목록
-                            .requestMatchers("/api/orders/**").hasRole("USER") //  주문목록
+                            .requestMatchers("/api/orders/**").permitAll() //  주문목록
+                            .requestMatchers("/api/categories/**").permitAll() //  카테고리목록
                             .requestMatchers("/api/deliveries/**").hasRole("USER") // 배달여부
                             .requestMatchers("/api/admin/**").hasAnyRole("MANAGER", "ADMIN") // 관리자 화면
                             .anyRequest().authenticated(); // 다른 요청은 인증 필요
