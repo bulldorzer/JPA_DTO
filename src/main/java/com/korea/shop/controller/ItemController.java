@@ -4,6 +4,7 @@ import com.korea.shop.dto.CustomPage;
 import com.korea.shop.dto.ItemDTO;
 import com.korea.shop.service.ItemService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.hibernate.query.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/items")
 @RequiredArgsConstructor
+@Log4j2
 public class ItemController {
 
     private final ItemService itemService;

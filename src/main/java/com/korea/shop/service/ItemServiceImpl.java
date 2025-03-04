@@ -7,6 +7,7 @@ import com.korea.shop.domain.item.Movie;
 import com.korea.shop.dto.CustomPage;
 import com.korea.shop.dto.ItemDTO;
 import com.korea.shop.repository.ItemRepository;
+import com.korea.shop.util.CustomFileUtil;
 import com.korea.shop.util.NoDataFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -27,11 +30,20 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final ModelMapper modelMapper;
+    private final CustomFileUtil fileUtil;
 
     @Transactional
     @Override
     public void saveItem(ItemDTO itemDTO) {
         Item item = transferItem(itemDTO);
+        log.info("Register : "+itemDTO);
+        List<MultipartFile> files = itemDTO.getFiles();
+
+        List<String> uploadFileNames = fileUtil.saveFiles(files);
+
+        itemDTO.setUploadFileNames(uploadFileNames);
+
+        log.info(uploadFileNames);
         itemRepository.save(item);
     }
 

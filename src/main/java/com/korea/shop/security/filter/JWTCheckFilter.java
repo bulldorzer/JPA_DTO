@@ -35,9 +35,12 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         log.info("==========<shouldNotFilter>==========");
 
         String path = request.getServletPath();
+        log.info("path = "+path);
+//        log.info(path.startsWith("/api/items/"));
 
         // 로그인 요청, /api/items, OPTIONS는 필터 제외 - 보안검색
-        if (path.startsWith("/api/members/login") || path.startsWith("/api/items/") || path.startsWith("/api/categories/")){
+        if (path.startsWith("/api/members/login") || path.startsWith("/api/items") || path.startsWith("/api/categories")){
+            log.info("해당 경로 토큰 검사 건너뜀");
             return true;
         }
 
@@ -48,6 +51,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         * PUT, DELETE 수정, 삭제 요청할경우 사전에 보냄 = 사전 체크하는 기능
         */
         if (request.getMethod().equals("OPTIONS")){
+            log.info("OPTIONS 신호  토큰 검사 건너뜀");
             return true;
         }
 
