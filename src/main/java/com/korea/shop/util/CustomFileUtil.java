@@ -4,6 +4,9 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -66,5 +69,14 @@ public class CustomFileUtil {
         return uploadNames;
 
     }
+
+    // 업로드 사진보여주기
+//    public ResponseEntity<Resource> getFile(String fileName){
+//        Resource resource = new FileSystemResource(uploadPath+ File.separator+fileName);
+//
+//        if (! resource.isReadable()){
+//            resource = new FileSystemResource(uploadPath+ File.separator+"default.jpeg");
+//        }
+//    }
 
 }

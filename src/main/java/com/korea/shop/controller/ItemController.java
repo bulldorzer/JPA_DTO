@@ -43,7 +43,7 @@ public class ItemController {
 
     // 아이템 생성
     @PostMapping
-    public ResponseEntity<ItemDTO> createItem(@RequestBody ItemDTO itemDTO) {
+    public ResponseEntity<ItemDTO> createItem(ItemDTO itemDTO) {
         itemService.saveItem(itemDTO);
         return ResponseEntity.ok(itemDTO);
     }
