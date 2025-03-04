@@ -37,7 +37,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
 
         // 로그인 요청, /api/items, OPTIONS는 필터 제외 - 보안검색
-        if (path.startsWith("/api/members/login") || path.startsWith("/api/items/")){
+        if (path.startsWith("/api/members/login") || path.startsWith("/api/items/") || path.startsWith("/api/categories/")){
             return true;
         }
 

@@ -75,7 +75,7 @@ public class CustomSecurityConfig {
 //                            .requestMatchers("/api/members/login").permitAll() // 로그인 화면
                             .requestMatchers("/api/items/**").permitAll() //  상품목록
                             .requestMatchers("/api/orders/**").permitAll() //  주문목록
-                            .requestMatchers("/api/categories/**").permitAll() //  카테고리목록
+                            .requestMatchers("/api/categories/**").permitAll() // 카테고리 목록
                             .requestMatchers("/api/deliveries/**").hasRole("USER") // 배달여부
                             .requestMatchers("/api/admin/**").hasAnyRole("MANAGER", "ADMIN") // 관리자 화면
                             .anyRequest().authenticated(); // 다른 요청은 인증 필요

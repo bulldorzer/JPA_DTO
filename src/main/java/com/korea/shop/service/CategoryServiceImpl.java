@@ -77,6 +77,8 @@ public class CategoryServiceImpl implements CategoryService{
         return categiryRepository.findAll();
     }
 
+
+
     //  상위카테고리만 조회
     @Override
     public List<Category> getParentCategories() {
@@ -97,8 +99,28 @@ public class CategoryServiceImpl implements CategoryService{
     
     // 카테고리 수정
     //  카테고리 이름 수정
+    @Override
+    public Category updateCategory(Long id, String name) {
+        Category existingCategory = categiryRepository.findById(id)
+                .orElseThrow(()-> new RuntimeException("Category not found"));
+        existingCategory.setName(name);
+
+        return categiryRepository.save(existingCategory);
+    }
+
     //  부모 카테고리 수정
-    
+    @Override
+    public Category updateParentCategory(Long id, Long parentId) {
+        Category existingCategory = categiryRepository.findById(id)
+                .orElseThrow(()-> new RuntimeException("Category not found"));
+
+        Category parentCategory = categiryRepository.findById(parentId)
+                .orElseThrow(()-> new RuntimeException("parentCategory not found"));
+
+        existingCategory.setParent(parentCategory);
+        return categiryRepository.save(existingCategory);
+    }
+
     // 카테고리 삭제
     
 }

@@ -4,6 +4,7 @@ import com.korea.shop.domain.Category;
 import com.korea.shop.dto.CategoryDTO;
 import com.korea.shop.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/categories")
+@RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
@@ -45,5 +46,21 @@ public class CategoryController {
     @PostMapping("/{parentId}/addChild")
     public Category createChildCategory(@PathVariable Long parentId,@RequestParam String name){
         return categoryService.addChildCategory(parentId,name);
+    }
+
+    // 카테고리 이름변경
+    @PutMapping("/{categoryId}")
+    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long categoryId, @RequestParam String name){
+        Category updatedCategory = categoryService.updateCategory(categoryId, name);
+        CategoryDTO categoryDTO = new CategoryDTO(updatedCategory);
+        return ResponseEntity.ok(categoryDTO);
+    }
+
+    // 부모 카테고리 수정
+    @PutMapping("{parentId}")
+    public ResponseEntity<CategoryDTO> updateParentCategory(@RequestParam Long id,@PathVariable Long parentId){
+        Category updatedCategory = categoryService.updateParentCategory(id, parentId);
+        CategoryDTO categoryDTO = new CategoryDTO(updatedCategory);
+        return ResponseEntity.ok(categoryDTO);
     }
 }

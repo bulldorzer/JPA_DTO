@@ -42,4 +42,13 @@ public class CategoryServiceTest {
         Category category = categiryRepository.findById(savedId).orElseThrow();
         assertEquals(name, category.getName(), "이름이 일치합니다.");
     }
+
+    @Test
+    public void 카테고리수정(){
+        // Given
+
+        // when
+
+        // then
+    }
 }
