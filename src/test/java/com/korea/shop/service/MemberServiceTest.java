@@ -28,6 +28,13 @@ import static org.junit.jupiter.api.Assertions.*;
 // @Transactional(readOnly = true)
 public class MemberServiceTest {
 
+    /*
+    * 1) ModelMapper객체화
+    * 2) MemberService 구현화
+    * 3) MemberRepository 객체화
+    * 4) EntityManager 객체화
+    * 5) PasswordEncoder 객체화
+    * */
     @Autowired private ModelMapper modelMapper;
     @Autowired private MemberService memberService;
     @Autowired private MemberRepository memberRepository;
@@ -42,50 +49,52 @@ public class MemberServiceTest {
 
     @Test
         // @Transactional
+    /*
+    ✅✅✅ 중시! 항상 테스트 파일에서는 @Test어노테이션이 필수!!!!
+    * 1) 랜덤객체생성
+    * 2) 10개의 사용자를 만들기 위해 10번 반복
+    * 3) 각 엔티티 필드에 값의 초기화
+    * 4) 비밀번호는 암호화 처리
+    * 5) 반복문 한번마다 한행의 객체 생성 builder pattern ( builder().build(); )
+    * 6) 1~4 User권한 5~7 MANAGER 권한 8~10 ADMIN권한 부여
+    * 7) Service에서는 매개변수를 DTO형태로 받기 떄문에 mapper로 DTO변환
+    * 8) 멤버 저장 실행
+    * */
     void 멤버_더미데이터_생성() {
         Random random = new Random();
-
-        IntStream.range(0, 10).forEach(i -> {
-            String name = "user" + i;
-            String email = "user" + i + "@aaa.com";
-            String password = "1111";
-            String district = DISTRICTS[random.nextInt(DISTRICTS.length)];
-            String zipcode = String.valueOf(10000 + random.nextInt(90000));
-
-            Address address = new Address("서울", district, zipcode);
+        IntStream.range(0,10).forEach(i->{
+            String name = "KimSeulGi"+i;
+            String email = "KimSeulGi"+i+"@Redvelet.com";
+            String pw = passwordEncoder.encode("3333");
+            String street = DISTRICTS[random.nextInt(DISTRICTS.length)];
+            String zipcode = String.valueOf(10000+ random.nextInt(90000));
+            Address address = new Address("서울",street,zipcode);
             Member member = Member.builder()
-                    .email(email)
-                    .pw(passwordEncoder.encode(password))
-                    .name(name)
-                    .address(address)
-                    .build();
-
+                    .name(name).email(email).pw(pw).address(address).build();
             member.addRole(MemberRole.USER);
-            if(i>=5){
+            if (i>4){
                 member.addRole(MemberRole.MANAGER);
             }
-            if(i>=8){
+            if (i>7){
                 member.addRole(MemberRole.ADMIN);
             }
-
             MemberDTO memberDTO = modelMapper.map(member, MemberDTO.class);
-
-            memberService.saveMember( memberDTO );
+            memberService.saveMember(memberDTO);
         });
 
         long count = memberService.getAllMembers().size();
-        assertThat(count).isEqualTo(10);
+        assertThat(count).isEqualTo(32); // 10과 같은지 아니면 false 생성
     }
 
     @Test
     public void 회원가입_테스트() throws Exception {
         // ✅ given - 테스트 데이터 생성
 
-        Address address = new Address("서울","강남구","88888");
+        Address address = new Address("서울","마포구","88888");
         Member member = Member.builder()
                 .address(address)
-                .name("Lee")
-                .email("user200@aaa.com")
+                .name("CHOI")
+                .email("user5542@aaa.com")
                 .pw(passwordEncoder.encode("1111"))
                 .build();
         member.addRole(MemberRole.USER);
@@ -106,138 +115,128 @@ public class MemberServiceTest {
     }
 
     @Test
+    /*
+    * 1) 총 2개의 중복회원 객체 생성
+    * 2) 첫 번째 회원 멤버저장 후 메세지 표시
+    * 3) 두 번째 회원 멤버 저장시 예외 처리 확인*/
     public void 중복회원_예외_테스트() {
-        // ✅ given - 동일한 이름의 회원 2명 생성
+        Random random = new Random();
+        String street = DISTRICTS[random.nextInt(DISTRICTS.length)];
+        String zipcode = String.valueOf(10000+ random.nextInt(90000));
+        Address address = new Address("서울시",street,zipcode);
         Member mem1 = Member.builder()
-                .name("Choi")
-                .pw(passwordEncoder.encode("1111"))
-                .memberRoleList(List.of(MemberRole.USER))
-                .build();
-
+                .name("ZZZ").email("zzz@zzz.com").pw("1111").address(address).build();
+        mem1.addRole(MemberRole.USER);
+        MemberDTO mem1DTO = modelMapper.map(mem1, MemberDTO.class);
         Member mem2 = Member.builder()
-                .name("Choi")
-                .pw(passwordEncoder.encode("1111"))
-                .build();
+                .name("ZZZ").email("zzz@zzz.com").pw("1111").address(address).build();
+        mem2.addRole(MemberRole.USER);
 
-        // ✅ when & then - 중복 가입 시 예외 발생 확인
-        Long savedId = memberService.saveMember(modelMapper.map(mem1, MemberDTO.class));
+        Long result = memberService.saveMember(mem1DTO);
+        System.out.println("mem1DTO 회원가입 성공"+ result);
 
-        System.out.println("✅ 첫 번째 회원 저장 완료! ID: " + savedId); // 🔍 로그 추가
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        System.out.println("--- 중복체크 확인 ---");
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,()->{
             memberService.saveMember(modelMapper.map(mem2, MemberDTO.class));
         });
 
-        assertEquals("이미 존재하는 회원", exception.getMessage(), "중복 회원 예외 메시지가 정확해야 합니다.");
-
-        System.out.println("✅ 중복 회원 예외 테스트 성공!");
+        assertEquals("이미 존재하는 회원",exception.getMessage(),"중복 메세지가 정확해야합니다!");
+        System.out.println(exception.getMessage());
     }
 
     @Test
     public void 회원조회_테스트() {
         // ✅ given - 회원 생성 및 저장
-        Member member = Member.builder()
-                .name("Hong")
-                .pw(passwordEncoder.encode("1111"))
-                .build();
-
-        Long memberId = memberService.saveMember(modelMapper.map(member, MemberDTO.class));
-
         // ✅ when - ID로 회원 조회
-        MemberDTO foundMember = memberService.getMember(memberId);
-
         // ✅ then - 회원 정보 검증
-        assertNotNull(foundMember, "회원이 정상적으로 조회되어야 합니다.");
-        assertEquals(member.getName(), foundMember.getName(), "이름이 일치해야 합니다.");
-        assertEquals(member.getEmail(), foundMember.getEmail(), "이메일이 일치해야 합니다.");
+        Member member = Member.builder()
+                .name("EEE").pw(passwordEncoder.encode("1111")).build();
+        Long id = memberService.saveMember(modelMapper.map(member,MemberDTO.class));
 
-        System.out.println("✅ 회원 조회 테스트 성공! ID: " + memberId);
+        MemberDTO foundmem = memberService.getMember(id);
+
+        assertNotNull(foundmem,"회원이 정상적으로 조회되어야합니다");
+        assertEquals(member.getName(),foundmem.getName(),"이름이 일치해야합니다.");
+        assertEquals(member.getEmail(),foundmem.getEmail(),"이메일 일치해야합니다.");
+
+        System.out.println("멤버 조회 성공 "+id);
+
     }
 
     // ✅ 존재하지 않는 회원 조회 시 예외 발생 테스트
     @Test
     public void 존재하지_않는_회원조회_예외_테스트() {
         // ✅ when & then - 존재하지 않는 회원 조회 시 예외 발생 검증
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            memberService.getMember(9999L); // 존재하지 않는 ID
+        RuntimeException exception = assertThrows(RuntimeException.class,()->{
+            memberService.getMember(999L);
         });
 
-        assertEquals("Member not found", exception.getMessage(), "올바른 예외 메시지가 반환되어야 합니다.");
-        System.out.println("✅ 존재하지 않는 회원 조회 예외 테스트 성공!");
+        assertEquals("Member not found",exception.getMessage(),"올바른 예외값이 아닙니다");
+        System.out.println(exception.getMessage());
+
     }
 
     @Test
     public void 회원삭제_테스트() {
         // ✅ given - 회원 생성 및 저장
-        Member member = Member.builder()
-                .name("홍길동")
-                .pw(passwordEncoder.encode("1111"))
-                .build();
-
-        Long memberId = memberService.saveMember(modelMapper.map(member, MemberDTO.class));
-
         // ✅ when - 회원 삭제
-        memberService.deleteMember(memberId);
-
         // ✅ then - 회원이 실제로 삭제되었는지 확인
-        assertFalse(memberService.existsById(memberId), "삭제된 회원은 조회되지 않아야 합니다.");
+        Member member = Member.builder().name("유세윤").pw("1111").build();
 
-        System.out.println("✅ 회원 삭제 테스트 성공! ID: " + memberId);
+        Long id = memberService.saveMember(modelMapper.map(member,MemberDTO.class));
+
+        memberService.deleteMember(id);
+
+        assertFalse(memberService.existsById(id),"삭제된 회원은 조회되지 않아야 합니다");
+        System.out.println(id+" 삭제완료.");
     }
 
     // ✅ 존재하지 않는 회원 삭제 시 예외 발생 테스트
     @Test
     public void 존재하지_않는_회원삭제_예외_테스트() {
         // ✅ when & then - 존재하지 않는 회원 삭제 시 예외 발생 검증
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            memberService.deleteMember(9999L); // 존재하지 않는 ID
+        RuntimeException exception = assertThrows(RuntimeException.class,()->{
+            memberService.deleteMember(999L);
         });
 
-        assertEquals("Member not found", exception.getMessage(), "올바른 예외 메시지가 반환되어야 합니다.");
-        System.out.println("✅ 존재하지 않는 회원 삭제 예외 테스트 성공!");
+        assertEquals("Member not found",exception.getMessage(),"예외가 메세지가 다르게 나옴");
+        System.out.println(exception.getMessage());
     }
 
     @Test
     @Transactional
     public void 회원정보_업데이트_테스트() {
         // ✅ given - 회원 생성 및 저장
-        Member member = Member.builder()
-                .name("홍길동")
-                .pw(passwordEncoder.encode("1111"))
-                .memberRoleList(new ArrayList<>()) // ✅ "USER" 역할 추가
-                .address(new Address("부산","해운대", "98765"))
-                .build();
-
-        member.addRole(MemberRole.USER);
-        MemberDTO dto = modelMapper.map(member, MemberDTO.class);
-        Long memberId = memberService.saveMember(dto);
-
         // ✅ DB 반영을 강제하여 memberRoleList 저장 확인
+        // ✅ when - 회원 정보 수정
+        // ✅ ModelMapper를 사용해서 변환 (수정된 설정 반영됨)
+        // ✅ then - 회원 정보가 정상적으로 변경되었는지 검증
+        Member member = Member.builder()
+                .name("이혜지").pw("1111")
+                .address(new Address("서울시","광진구","88373")).build();
+        member.addRole(MemberRole.USER);
+        Long memberId = memberService.saveMember(modelMapper.map(member,MemberDTO.class));
+
+        System.out.println("바뀌기전"+memberService.getMember(memberId).getName());
+
         em.flush();
         em.clear();
 
-        // ✅ when - 회원 정보 수정
-        Member updateInfo = Member.builder() // ✅ Builder 사용하여 필드 유지
-                .name("장보고")
-                .address(new Address("서울시", "마포구", "12345"))
-                .memberRoleList(new ArrayList<>(member.getMemberRoleList())) // ✅ 기존 역할 유지
-                .build();
+        Member updateMember = Member.builder()
+                .name("김슬기").pw("1111")
+                .address(new Address("전라남도","광주시","11541")).build();
 
-        // ✅ ModelMapper를 사용해서 변환 (수정된 설정 반영됨)
-        MemberDTO updatedDto = modelMapper.map(updateInfo, MemberDTO.class);
-        memberService.updateMember(memberId, updatedDto);
+        memberService.updateMember(memberId,modelMapper.map(updateMember,MemberDTO.class));
+        System.out.println("바뀐 후"+memberService.getMember(memberId).getName());
 
-        // ✅ then - 회원 정보가 정상적으로 변경되었는지 검증
-        MemberDTO updatedMember = memberService.getMember(memberId);
+        MemberDTO updatestatus = memberService.getMember(memberId);
 
-        System.out.println(updatedMember.getRoleNames().toString()); // ✅ 확인용 로그
-        System.out.println(updatedMember.getRoleNames().contains("USER")); // ✅ 확인용 로그
+        assertEquals("김슬기",updatestatus.getName(),"이름 변경이 되어야함");
+        assertEquals("11541",updatestatus.getAddress().getZipcode(),"집코드가 변경되아야함");
+        assertTrue(updatestatus.getRoleNames().contains("USER"), "권한이 USER로 되어있어야함");
 
-        assertEquals("장보고", updatedMember.getName(), "이름이 변경되어야 합니다.");
-        assertEquals("서울시", updatedMember.getAddress().getCity(), "주소가 변경되어야 합니다.");
-        assertTrue(updatedMember.getRoleNames().contains("USER"), "회원 역할이 'USER'로 설정되어야 합니다.");
+        System.out.println("updatestatus => "+updatestatus);
 
-        System.out.println("✅ 회원 정보 업데이트 테스트 성공!");
     }
 
 
