@@ -35,7 +35,14 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public void saveItem(ItemDTO itemDTO) {
-        Item item = transferItem(itemDTO);
+        Item item = modelMapper.map(itemDTO, Item.class);
+        if (item instanceof Book) {
+            System.out.println("저장 타입: BOOK");
+        } else if (item instanceof Movie) {
+            System.out.println("저장 타입: MOVIE");
+        } else if (item instanceof Album) {
+            System.out.println("저장 타입: ALBUM");
+        }
         log.info("Register : "+itemDTO);
         List<MultipartFile> files = itemDTO.getFiles();
 

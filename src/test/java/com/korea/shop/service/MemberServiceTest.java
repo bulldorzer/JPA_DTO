@@ -83,7 +83,7 @@ public class MemberServiceTest {
         });
 
         long count = memberService.getAllMembers().size();
-        assertThat(count).isEqualTo(32); // 10과 같은지 아니면 false 생성
+        assertThat(count).isEqualTo(10); // 10과 같은지 아니면 false 생성
     }
 
     @Test
@@ -244,25 +244,22 @@ public class MemberServiceTest {
     @Test
     public void 존재하지_않는_회원_업데이트_예외_테스트() {
         // ✅ given - 존재하지 않는 ID
-        Long nonExistentId = 9999L;
-
+        // 수정시킬 멤버 생성 멤버저장
         // ✅ when & then - 존재하지 않는 회원 업데이트 시 예외 발생 검증
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        Long nonExistId = 99999L;
+
+        RuntimeException exception = assertThrows(RuntimeException.class, ()->{
             Member member = Member.builder()
-                    .name("새로운 회원")
-                    .pw(passwordEncoder.encode("1111"))
-                    .address(new Address("서울시", "마포구", "45678"))
-                    .build();
+                    .name("실험용쥐").pw(passwordEncoder.encode("1111")).address(new Address("서울시","마포구","54236")).build();
 
-            Long memberId = memberService.saveMember(modelMapper.map(member, MemberDTO.class));
-            Member updateInfo = new Member();
+            Long memberId = memberService.saveMember(modelMapper.map(member,MemberDTO.class));
+            MemberDTO updateMember = memberService.getMember(memberId);
 
-            memberService.updateMember(nonExistentId, modelMapper.map(updateInfo, MemberDTO.class));
+            memberService.updateMember(nonExistId,updateMember);
         });
 
-
-        assertEquals("Member not found", exception.getMessage(), "올바른 예외 메시지가 반환되어야 합니다.");
-        System.out.println("✅ 존재하지 않는 회원 업데이트 예외 테스트 성공!");
+        assertEquals("Member not found",exception.getMessage(),"올바른 예외 메세지가 아닙니다");
+        System.out.println("에러메세지: "+exception.getMessage());
     }
 
 

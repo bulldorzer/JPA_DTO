@@ -69,6 +69,7 @@ class ItemServiceTest {
             }
 
             ItemDTO itemDTO = modelMapper.map(item, ItemDTO.class);
+            System.out.println("itemDTO "+itemDTO);
             itemService.saveItem(itemDTO); // ✅ repository 대신 service 사용
         });
 
