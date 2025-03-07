@@ -23,7 +23,7 @@ public class Member {
     private String email;
     private String pw;
 
-    @Embedded // 값 타입 포함
+    @Embedded // 값 타입 포함 하나의 릴레이션에 포함되는 객체
     private Address address;
 
     @ElementCollection(fetch = FetchType.LAZY)// 지연로딩, 필요시 추가 데이터 생성

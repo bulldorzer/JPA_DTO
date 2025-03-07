@@ -104,6 +104,7 @@ public class MemberServiceImpl implements MemberService {
                 .collect(Collectors.toList());
     }
 
+    // 회원이 존재하는지 확인
     @Override
     public boolean existsById(Long id) {
         return memberRepository.existsById(id);

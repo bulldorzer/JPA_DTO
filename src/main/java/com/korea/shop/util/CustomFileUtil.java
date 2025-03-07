@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -71,12 +72,42 @@ public class CustomFileUtil {
     }
 
     // 업로드 사진보여주기
-//    public ResponseEntity<Resource> getFile(String fileName){
-//        Resource resource = new FileSystemResource(uploadPath+ File.separator+fileName);
-//
-//        if (! resource.isReadable()){
-//            resource = new FileSystemResource(uploadPath+ File.separator+"default.jpeg");
-//        }
-//    }
+    public ResponseEntity<Resource> getFile(String fileName){
+        Resource resource = new FileSystemResource(uploadPath+ File.separator+fileName);
+
+        if (! resource.isReadable()){
+            resource = new FileSystemResource(uploadPath+ File.separator+"default.jpeg");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+
+        try {
+            headers.add("Content-Type", Files.probeContentType(resource.getFile().toPath() ));
+        }catch (Exception e){
+            return ResponseEntity.internalServerError().build();
+        }
+        return ResponseEntity.ok().headers(headers).body(resource);
+    }
+    
+    // 서버 내부에서 파일 삭제
+    public void deleteFiles(List<String> fileNames){
+        if (fileNames == null || fileNames.size()==0){
+            return;
+        }
+        
+        fileNames.forEach(fileName -> {
+            // 썸내일 있는지 확인하고 삭제
+            String thumbnailFileName = "s_" + fileName;
+            Path thumbnailPath = Paths.get(uploadPath, thumbnailFileName);
+            Path filePath = Paths.get(uploadPath, fileName);
+
+            try {
+                Files.deleteIfExists(filePath);
+                Files.deleteIfExists(thumbnailPath);
+            }catch (IOException e){
+                throw new RuntimeException(e.getMessage());
+            }
+        });
+    }
 
 }

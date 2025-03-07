@@ -35,6 +35,32 @@ public class Item {
     @Builder.Default
     private List<CategoryItem> categoryItems = new ArrayList<>();
 
+    // 삭제 여부
+    private boolean delFlag;
+
+    // 이미지 리스트
+    @ElementCollection
+    @Builder.Default
+    private List<ItemImage> imageList = new ArrayList<>();
+
+    // 상품에 이미지 추가
+    public void addImage(ItemImage image){
+        image.setOrd(this.imageList.size());
+        imageList.add(image);
+    }
+
+    // 상품에 이미지 파일이름 관리
+    public void addImageString(String fileName){
+
+        ItemImage itemImage = ItemImage.builder().fileName(fileName).build();
+        addImage(itemImage);
+    }
+
+    // 이미지 리스트 초기화
+    public void clearList(){
+        this.imageList.clear();
+    }
+
     public Item(String name, int price, int stockQuantity) {
         this.name = name;
         this.price = price;

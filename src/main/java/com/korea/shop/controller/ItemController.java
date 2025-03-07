@@ -3,9 +3,11 @@ package com.korea.shop.controller;
 import com.korea.shop.dto.CustomPage;
 import com.korea.shop.dto.ItemDTO;
 import com.korea.shop.service.ItemService;
+import com.korea.shop.util.CustomFileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.query.Page;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import java.util.List;
 public class ItemController {
 
     private final ItemService itemService;
+    private final CustomFileUtil fileUtil;
 
 //    @PreAuthorize("hasAnyRole('ROLE_USER')") // 예시
 //    @GetMapping
@@ -72,5 +75,11 @@ public class ItemController {
     @GetMapping("/{id}/exists")
     public ResponseEntity<Boolean> existsById(@PathVariable Long id) {
         return ResponseEntity.ok(itemService.existsById(id));
+    }
+
+    // 업로드 사진 보여주기
+    @GetMapping("/view/{fileName}")
+    public ResponseEntity<Resource> viewFileGet(@PathVariable String fileName){
+        return fileUtil.getFile(fileName);
     }
 }
