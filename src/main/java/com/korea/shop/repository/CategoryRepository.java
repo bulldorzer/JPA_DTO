@@ -9,7 +9,7 @@ import java.util.Optional;
 
 // JpaRepository<엔티티, PK>
 @Repository
-public interface CategiryRepository extends JpaRepository<Category, Long> {
+public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     // select c from category c where c.name = :name;
     // 데이터가 1개만 나온다 = Optional

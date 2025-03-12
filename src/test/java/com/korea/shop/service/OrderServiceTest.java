@@ -73,7 +73,7 @@ class OrderServiceTest {  // ✅ 클래스명 앞에 `public` 제거 (Junit 5에
         Long orderItemId = orderItem.getId();
         orderService.cancelOrderItem(orderItemId);
 
-        // then - 아이템 주문 취소후 아이템 수량 및 주문서확인
+        // then - 아이템 주문 취소후 아이템 수량 및 주문서확인ㅖ
         assertEquals(10, item.getStockQuantity(), "취소 수량이 복구되지 않았습니다!");
         System.out.println("아이템수량 테스트 "+item.getStockQuantity());
         assertEquals(1, orderItemList.size(),"주문서까지 삭제 되었습니다!");

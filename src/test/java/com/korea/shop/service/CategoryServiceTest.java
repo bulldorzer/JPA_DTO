@@ -1,7 +1,7 @@
 package com.korea.shop.service;
 
 import com.korea.shop.domain.Category;
-import com.korea.shop.repository.CategiryRepository;
+import com.korea.shop.repository.CategoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +15,7 @@ public class CategoryServiceTest {
     private CategoryService categoryService;
 
     @Autowired
-    private CategiryRepository categiryRepository;
+    private CategoryRepository categoryRepository;
 
     @Test
     public void  상위_카테고리등록(){
@@ -26,7 +26,7 @@ public class CategoryServiceTest {
         Long savedId = categoryService.addParentCatagory(name).getId();
 
         // then
-        Category category = categiryRepository.findById(savedId).orElseThrow();
+        Category category = categoryRepository.findById(savedId).orElseThrow();
         assertEquals(name, category.getName(), "이름이 일치합니다.");
     }
 
@@ -39,7 +39,7 @@ public class CategoryServiceTest {
         Long savedId = categoryService.addChildCategory(parentId,name).getId();
 
         // then
-        Category category = categiryRepository.findById(savedId).orElseThrow();
+        Category category = categoryRepository.findById(savedId).orElseThrow();
         assertEquals(name, category.getName(), "이름이 일치합니다.");
     }
 
