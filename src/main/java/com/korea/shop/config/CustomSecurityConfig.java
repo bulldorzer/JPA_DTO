@@ -28,6 +28,8 @@ import java.util.Arrays;
 @EnableMethodSecurity
 /*
 * 보안 설정
+* 현재 이소스는 Cors설정이 꼬여있으므로
+* C:\02.exam\project2\backend\mallapi_Security 경로의 프로젝트를 참조할것
 */
 public class CustomSecurityConfig {
 
@@ -72,7 +74,7 @@ public class CustomSecurityConfig {
                 // url 접근 제어 허용 가능한 url 등록
                 .authorizeHttpRequests( atuhz -> {
                     atuhz
-//                            .requestMatchers("/api/members/login").permitAll() // 로그인 화면
+                            .requestMatchers("/api/members/login").permitAll() // 로그인 화면
                             .requestMatchers("/api/items/**").permitAll() //  상품목록
                             .requestMatchers("/api/orders/**").permitAll() //  주문목록
                             .requestMatchers("/api/categories/**").permitAll() // 카테고리 목록

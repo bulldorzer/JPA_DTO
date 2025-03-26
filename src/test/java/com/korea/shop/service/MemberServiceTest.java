@@ -60,12 +60,13 @@ public class MemberServiceTest {
     * 7) Service에서는 매개변수를 DTO형태로 받기 떄문에 mapper로 DTO변환
     * 8) 멤버 저장 실행
     * */
-    void 멤버_더미데이터_생성() {
+    @Test
+    public void 멤버_더미데이터_생성() {
         Random random = new Random();
         IntStream.range(0,10).forEach(i->{
-            String name = "KimSeulGi"+i;
-            String email = "KimSeulGi"+i+"@Redvelet.com";
-            String pw = passwordEncoder.encode("3333");
+            String name = "user" + i;
+            String email = "user" + i + "@aaa.com";
+            String pw = "1111";
             String street = DISTRICTS[random.nextInt(DISTRICTS.length)];
             String zipcode = String.valueOf(10000+ random.nextInt(90000));
             Address address = new Address("서울",street,zipcode);
