@@ -79,12 +79,19 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList());
     }
 
+    // 전체 주문 상품 페이징처리
     @Override
     public CustomPage<OrderDTO> getAllItemsPaged(Pageable pageable) {
+
+        // order엔티티를 페이지네이션된 형태로 조회
         Page<Order> orderPage = orderRepository.findAll(pageable);
+
+        // 조회된 페이지가 없으면 예외처리
         if (orderPage.isEmpty()){
             throw new NoDataFoundException("조회된 데이터가 없습니다.");
         }
+
+        // 엔티티 -> DTO 로 변환
         Page<OrderDTO> dtoPage = orderPage.map(order -> modelMapper.map(order, OrderDTO.class));
         log.info("======<OrderDtoPage>======");
         log.info(dtoPage.getContent());
